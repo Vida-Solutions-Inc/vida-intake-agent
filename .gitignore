@@ -1,0 +1,20 @@
+# Secrets
+.env
+
+# Logs and runtime artifacts
+logs/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
