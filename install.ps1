@@ -22,17 +22,17 @@ if (-not $py) {
     exit 1
 }
 
-Write-Host "Creating virtual environment (.venv)…"
+Write-Host "Creating virtual environment (.venv)..."
 $pyParts = $py.Split(" ")
 & $pyParts[0] $pyParts[1..($pyParts.Length-1)] -m venv .venv
 
 $venvPy = Join-Path $root ".venv\Scripts\python.exe"
 & $venvPy -m pip install --upgrade pip --quiet
-Write-Host "Installing Intake Agent and dependencies…"
+Write-Host "Installing Intake Agent and dependencies..."
 & $venvPy -m pip install --quiet ".[all]"
 
 Write-Host ""
-Write-Host "Installed. Launching setup…" -ForegroundColor Green
+Write-Host "Installed. Launching setup..." -ForegroundColor Green
 Write-Host ""
 & $venvPy -m intake_agent setup
 

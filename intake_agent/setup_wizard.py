@@ -105,8 +105,11 @@ def run_setup(reconfigure: bool = False) -> int:
     if current and not _yes("An API key is already configured. Replace it?", default=False):
         pass
     else:
-        key = _ask_secret("Paste your Anthropic API key (input hidden)")
+        key = _ask_key("Paste your Anthropic API key")
         if key:
+            if not key.startswith("sk-ant-"):
+                out("   [yellow]Heads up:[/yellow] keys normally start with 'sk-ant-'. "
+                    "Double-check the paste if the API check fails below.")
             backend = store_api_key(key)
             if backend == "keychain":
                 out("   Stored in your OS keychain.")
@@ -154,6 +157,34 @@ def _ask_secret(label: str) -> str:
         return getpass.getpass("> ").strip()
     except (EOFError, KeyboardInterrupt):
         return ""
+
+
+def _mask(s: str) -> str:
+    """Show enough to confirm a paste without printing the whole secret."""
+    if len(s) <= 12:
+        return "*" * len(s)
+    return f"{s[:7]}...{s[-4:]}"
+
+
+def _ask_key(label: str) -> str:
+    """Visible key entry with a masked confirmation, so a failed paste is obvious.
+
+    Input is shown (so you can see it landed); we then echo a masked summary and
+    ask you to confirm before saving.
+    """
+    out(label + " (visible, so you can confirm it pasted):")
+    try:
+        resp = input("> ").strip()
+    except (EOFError, KeyboardInterrupt):
+        return ""
+    if not resp:
+        out("   [yellow]Nothing was entered.[/yellow] If paste didn't work, try right-click "
+            "or the terminal's Edit > Paste, then run setup again.")
+        return ""
+    out(f"   Read a key: [cyan]{_mask(resp)}[/cyan]  ({len(resp)} characters)")
+    if not _yes("Use this key?", default=True):
+        return _ask_key(label)
+    return resp
 
 
 def _yes(label: str, default: bool = True) -> bool:

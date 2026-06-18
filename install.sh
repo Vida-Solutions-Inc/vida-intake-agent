@@ -22,7 +22,7 @@ if [ -z "$PY" ]; then
   exit 1
 fi
 
-echo "Creating virtual environment (.venv)…"
+echo "Creating virtual environment (.venv)..."
 "$PY" -m venv .venv
 # venv layout differs: .venv/bin on Unix, .venv/Scripts on Windows (Git Bash).
 if [ -f .venv/bin/activate ]; then
@@ -37,11 +37,11 @@ fi
 source "$BIN/activate"
 
 python -m pip install --upgrade pip --quiet
-echo "Installing Intake Agent and dependencies…"
+echo "Installing Intake Agent and dependencies..."
 python -m pip install --quiet ".[all]"
 
 echo ""
-echo "Installed. Launching setup…"
+echo "Installed. Launching setup..."
 echo ""
 python -m intake_agent setup
 
