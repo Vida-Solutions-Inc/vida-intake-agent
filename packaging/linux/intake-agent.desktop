@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Intake Agent
+Comment=File documents into the right place in your repository, using Claude
+Exec=IntakeAgent
+Icon=intake-agent
+Categories=Utility;Office;
+Terminal=false

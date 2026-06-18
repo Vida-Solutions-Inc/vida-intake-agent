@@ -1,20 +1,36 @@
-# Secrets
+# Secrets / local env
 .env
-
-# Logs and runtime artifacts
-logs/
-*.log
 
 # Python
 __pycache__/
 *.py[cod]
 *.egg-info/
+.eggs/
+build/
+dist/
 .venv/
 venv/
 env/
+
+# Packaging artifacts
+*.spec.bak
+build_pyi/
+Output/
+AppDir/
+packaging/build/
+*.app
+*.dmg
+*.AppImage
+
+# Logs and runtime
+logs/
+*.log
 
 # Editor / OS
 .idea/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Scratch
+docs_icon_states.png

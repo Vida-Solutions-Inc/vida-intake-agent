@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "intake-agent"
+version = "0.2.0"
+description = "A local desktop agent that watches an inbox folder and files documents into the right place in any repository, using Claude."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Vida Solutions, Inc." }]
+keywords = ["claude", "anthropic", "file-organizer", "watchdog", "automation", "desktop"]
+
+# Core runtime. Everything here is pure-Python or ships ARM64 + x86_64 wheels,
+# so `pip install` works on Windows (incl. Snapdragon/ARM64), macOS, and Linux
+# without a Node.js / claude-CLI toolchain.
+dependencies = [
+    "anthropic>=0.40",
+    "watchdog>=4.0",
+    "platformdirs>=4.0",
+    "tomli-w>=1.0",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+# Document text/vision extraction. Without these the agent still runs, but it
+# can only read plain-text files; PDFs/Office docs route to review.
+extract = [
+    "pypdf>=4.0",
+    "python-docx>=1.1",
+    "openpyxl>=3.1",
+    "python-pptx>=0.6",
+    "Pillow>=10.0",
+]
+# System-tray desktop app.
+tray = [
+    "pystray>=0.19",
+    "Pillow>=10.0",
+]
+# OS keychain storage for the API key (recommended).
+keyring = [
+    "keyring>=24.0",
+]
+# Everything a normal desktop user wants.
+all = [
+    "intake-agent[extract,tray,keyring]",
+]
+dev = [
+    "pytest>=8.0",
+    "intake-agent[extract,tray,keyring]",
+]
+
+[project.scripts]
+intake = "intake_agent.cli:main"
+
+[project.gui-scripts]
+intake-app = "intake_agent.gui:main"
+intake-tray = "intake_agent.tray:main"
+
+[project.urls]
+Homepage = "https://github.com/Vida-Solutions-Inc/vida-intake-agent"
+Repository = "https://github.com/Vida-Solutions-Inc/vida-intake-agent"
+
+[tool.hatch.build.targets.wheel]
+packages = ["intake_agent"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
