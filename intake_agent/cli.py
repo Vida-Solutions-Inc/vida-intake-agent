@@ -75,6 +75,15 @@ def cmd_tray(args) -> int:
     return run_tray(cfg, key)
 
 
+def cmd_gui(args) -> int:
+    try:
+        from .gui import run_gui
+    except Exception as e:
+        _print(f"[red]GUI unavailable:[/red] {e}")
+        return 1
+    return run_gui()
+
+
 def cmd_status(args) -> int:
     from .config import load_config, resolve_api_key, config_exists
     from .ledger import Ledger
@@ -265,6 +274,9 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("once", help="Process the current inbox, then exit.")
     s.add_argument("--dry-run", action="store_true")
     s.set_defaults(func=cmd_once)
+
+    s = sub.add_parser("gui", help="Launch the desktop control-panel window.")
+    s.set_defaults(func=cmd_gui)
 
     s = sub.add_parser("tray", help="Launch the system-tray desktop app.")
     s.set_defaults(func=cmd_tray)

@@ -1,0 +1,129 @@
+name: Build installers
+
+# Produces downloadable installers for Windows, macOS, and Linux:
+#   - Windows: IntakeAgentSetup.exe   (Inno Setup, per-user, no admin)
+#   - macOS:   IntakeAgent.dmg         (drag-to-Applications)
+#   - Linux:   IntakeAgent-x86_64.AppImage
+#
+# Trigger by pushing a version tag (e.g. `git tag v0.2.0 && git push --tags`),
+# or run manually via "Run workflow". On a tag, the artifacts are attached to a
+# GitHub Release you can link from your website.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Derive version
+        id: ver
+        shell: bash
+        run: |
+          ref="${GITHUB_REF_NAME:-dev}"
+          if [[ "$ref" == v* ]]; then echo "version=${ref#v}" >> "$GITHUB_OUTPUT";
+          else echo "version=0.0.0-dev" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Linux Tk runtime
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y python3-tk
+
+      - name: Install app + build tools
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[all]" pyinstaller
+          python packaging/make_icon.py
+
+      - name: Build executable (PyInstaller)
+        shell: bash
+        run: pyinstaller packaging/intake-agent.spec --noconfirm --distpath dist --workpath build_pyi
+
+      # ---------------------------------------------------------------- Windows
+      - name: Windows installer (Inno Setup)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=${{ steps.ver.outputs.version }} packaging\windows\intake-agent.iss
+          Get-ChildItem Output
+
+      - name: Upload Windows installer
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: IntakeAgent-Windows
+          path: Output/IntakeAgentSetup.exe
+
+      # ------------------------------------------------------------------ macOS
+      - name: macOS dmg
+        if: runner.os == 'macOS'
+        run: |
+          hdiutil create -volname "Intake Agent" -srcfolder "dist/IntakeAgent.app" \
+            -ov -format UDZO "IntakeAgent.dmg"
+
+      - name: Upload macOS dmg
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: IntakeAgent-macOS
+          path: IntakeAgent.dmg
+
+      # ------------------------------------------------------------------ Linux
+      - name: Linux AppImage
+        if: runner.os == 'Linux'
+        run: |
+          set -e
+          APPDIR=AppDir
+          mkdir -p "$APPDIR/usr/bin"
+          cp dist/IntakeAgent "$APPDIR/usr/bin/IntakeAgent"
+          cp packaging/build/icon.png "$APPDIR/intake-agent.png"
+          cp packaging/linux/intake-agent.desktop "$APPDIR/intake-agent.desktop"
+          cat > "$APPDIR/AppRun" <<'EOF'
+          #!/bin/sh
+          HERE="$(dirname "$(readlink -f "$0")")"
+          exec "$HERE/usr/bin/IntakeAgent" "$@"
+          EOF
+          chmod +x "$APPDIR/AppRun"
+          wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool-x86_64.AppImage
+          APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool-x86_64.AppImage "$APPDIR" IntakeAgent-x86_64.AppImage
+
+      - name: Upload Linux AppImage
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: IntakeAgent-Linux
+          path: IntakeAgent-x86_64.AppImage
+
+  release:
+    name: Attach to Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          fail_on_unmatched_files: true
+          generate_release_notes: true

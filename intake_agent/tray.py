@@ -246,16 +246,24 @@ def run_tray(config: Config, api_key: str) -> int:
 def main() -> int:
     """Entry point for the `intake-tray` GUI script."""
     from .config import ConfigError, load_config, resolve_api_key
+    from .singleton import SingleInstance
+    guard = SingleInstance()
+    if not guard.acquire():
+        # Another instance (GUI or tray) is already watching; nothing to do.
+        return 0
     try:
-        cfg = load_config()
-    except ConfigError:
-        print("Not configured. Run `intake setup` first.")
-        return 1
-    key = resolve_api_key(cfg)
-    if not key:
-        print("No API key. Run `intake setup` first.")
-        return 1
-    return run_tray(cfg, key)
+        try:
+            cfg = load_config()
+        except ConfigError:
+            print("Not configured. Run `intake setup` first.")
+            return 1
+        key = resolve_api_key(cfg)
+        if not key:
+            print("No API key. Run `intake setup` first.")
+            return 1
+        return run_tray(cfg, key)
+    finally:
+        guard.release()
 
 
 if __name__ == "__main__":

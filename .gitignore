@@ -14,6 +14,13 @@ env/
 
 # Packaging artifacts
 *.spec.bak
+build_pyi/
+Output/
+AppDir/
+packaging/build/
+*.app
+*.dmg
+*.AppImage
 
 # Logs and runtime
 logs/

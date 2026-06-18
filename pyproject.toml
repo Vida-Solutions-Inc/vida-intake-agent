@@ -55,6 +55,7 @@ dev = [
 intake = "intake_agent.cli:main"
 
 [project.gui-scripts]
+intake-app = "intake_agent.gui:main"
 intake-tray = "intake_agent.tray:main"
 
 [project.urls]

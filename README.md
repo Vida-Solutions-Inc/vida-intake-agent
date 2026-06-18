@@ -19,7 +19,21 @@ domain specifics. Runs on **Windows, macOS, and Linux**.
 
 ## Quick start
 
-### Easiest (one script)
+### Easiest (no Python needed) - download the installer
+
+Grab the installer for your OS from the project's
+[Releases](https://github.com/Vida-Solutions-Inc/vida-intake-agent/releases) page:
+
+- **Windows** - `IntakeAgentSetup.exe` (per-user, no admin prompt)
+- **macOS** - `IntakeAgent.dmg` (drag to Applications)
+- **Linux** - `IntakeAgent-x86_64.AppImage` (`chmod +x`, then run)
+
+Double-click to launch the app, click **Settings** to pick your repository
+folder and paste your Anthropic API key, then press **Start**. No terminal, no
+Python install required. Configure run-at-login and the system tray from the
+window. (Installers are produced by the [build workflow](.github/workflows/build-installers.yml).)
+
+### One script (from a clone)
 
 Clone or download this repo, then:
 
@@ -89,7 +103,8 @@ file, and the agent can't fabricate a move that didn't happen.
 
 | Command | What it does |
 |---|---|
-| `intake setup` | Interactive first-run configuration. |
+| `intake gui` | Open the desktop control-panel window (Start/Stop, settings, activity). |
+| `intake setup` | Interactive first-run configuration (terminal). |
 | `intake tray` | Run as a system-tray app (start/stop, status, open folders, approvals). |
 | `intake start` | Watch the inbox in the terminal. `--dry-run` to detect without acting. |
 | `intake once` | Process whatever is in the inbox now, then exit. |
@@ -101,6 +116,16 @@ file, and the agent can't fabricate a move that didn't happen.
 | `intake config` | Print the active config file. |
 
 ---
+
+## The desktop window
+
+`intake gui` (or the installed app) opens a control panel: a **Start/Stop**
+button (the manual run style), live status and a recent-activity feed, buttons
+to open the inbox / review / repo / logs, a **Settings** screen (pick your repo
+folder, paste your API key, choose the new-folder policy), a **Run at login**
+toggle, and **Hide to tray**. Only one copy runs at a time (a single-instance
+guard prevents the tray, the window, and the login launcher from double-watching
+the same inbox).
 
 ## The tray app
 

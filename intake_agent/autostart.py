@@ -21,7 +21,11 @@ _LABEL = "com.vidasolutions.intake-agent"
 
 
 def _launch_cmd() -> list[str]:
-    # Prefer the windowless interpreter on Windows so no console flashes.
+    # Frozen app (PyInstaller): the exe IS the launcher; start it in tray mode.
+    if getattr(sys, "frozen", False):
+        return [sys.executable, "--tray"]
+    # Source/pip install: run the module. Prefer the windowless interpreter on
+    # Windows so no console flashes at login.
     exe = sys.executable
     if IS_WINDOWS:
         pyw = Path(exe).with_name("pythonw.exe")
