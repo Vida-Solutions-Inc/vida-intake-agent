@@ -140,6 +140,22 @@ def test_profile_excludes_inbox_and_noise(tmp_path: Path):
     assert ".git" not in text and "node_modules" not in text
 
 
+# ----------------------------------------------------------------- watcher skip
+def test_rules_file_is_never_routed(tmp_path: Path):
+    from intake_agent.watcher import IntakeService
+    repo = tmp_path / "repo"
+    (repo / "00_intake" / "review").mkdir(parents=True)
+    cfg = Config(repo_root=str(repo), rules_file="00_intake/intake.rules.md")
+    cfg.rules_path.write_text("# rules", encoding="utf-8")
+    svc = IntakeService(cfg, "sk-ant-fake")
+    try:
+        doc = cfg.intake_path / "invoice.pdf"; doc.write_text("x")
+        assert svc._should_skip(cfg.rules_path) is True
+        assert svc._should_skip(doc) is False
+    finally:
+        svc.ledger.close()
+
+
 # ----------------------------------------------------------------- extract
 def test_extract_text(tmp_path: Path):
     f = tmp_path / "n.txt"; f.write_text("Invoice from Acme")

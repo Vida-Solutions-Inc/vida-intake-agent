@@ -224,9 +224,20 @@ class IntakeService:
             return True
         if path.is_dir():
             return True  # folders are not routed in this version
+        if self._is_rules_file(path):
+            return True  # the routing rules file is config, never a document to file
         if path.suffix.lower() in set(self.config.skip_extensions):
             return True
         return self._is_protected(path)
+
+    def _is_rules_file(self, path: Path) -> bool:
+        rules = self.config.rules_path
+        if not rules:
+            return False
+        try:
+            return path.resolve() == rules.resolve()
+        except OSError:
+            return False
 
     @staticmethod
     def _is_protected(path: Path) -> bool:
