@@ -1,72 +1,169 @@
 # Intake Agent
 
-A daemon that watches `00_intake/` and routes dropped files to the correct location in the repo. Built on the Claude Agent SDK — Claude does the routing using its standard tools (Read, Glob, Bash); this repo is just the watcher and the system prompt.
+A small desktop app that watches an **inbox folder** and files whatever you drop
+into it to the right place in **your repository** - using Claude to read each
+document and decide where it belongs.
 
-## Architecture
+Drop an invoice, a bank statement, a signed contract, a meeting note, a receipt
+photo. The agent reads it, finds the best-matching folder in your repo, renames
+it to match the folder's existing convention, and moves it there. Anything it
+isn't sure about goes to a `review/` folder, untouched.
 
-```
-watcher.py   watchdog -> stability check -> async queue (serial)
-agent.py     spawns Claude Agent SDK per item, parses RESULT line
-AGENT.md     system prompt: repo map + routing rules
-config.py    paths, model, skip lists, stability tuning
-```
+It works on **any repository** with no hand-written rules: it learns your folder
+structure by looking at it. Power users can add an optional `intake.rules.md` for
+domain specifics. Runs on **Windows, macOS, and Linux**.
 
-**Split of responsibility:**
-- **Agent (read-only)** — Read, Glob, Grep, Skill. Decides destination + filename, emits a VERDICT line. Cannot move or write anything.
-- **Watcher** — performs the actual `shutil.move`, creates new folders, dedupes by hash, routes uncertain items to `review/`, cleans up the staged copy.
+> Pure Python. No Node.js, no external CLI - just `pip install` and go.
 
-This split means the agent can't lie about a move succeeding, and a crash mid-loop never leaves files in a half-routed state.
+---
 
-**Staging:** files are copied to `C:\Temp\intake_agent\<uuid>\` before the agent reads them. Reading straight out of OneDrive caused intermittent 0xC0000005 native crashes (sync touching the file mid-read). The staged copy isolates the read path. Override the staging root with `INTAKE_TEMP_ROOT` in `.env`.
+## Quick start
 
-## Setup
+### Easiest (one script)
+
+Clone or download this repo, then:
+
+- **Windows** - right-click `install.ps1` → *Run with PowerShell*
+  (or `powershell -ExecutionPolicy Bypass -File install.ps1`)
+- **macOS / Linux** - `bash install.sh`
+
+The script creates a local virtual environment, installs everything, and walks
+you through setup (repo path, inbox folder, API key).
+
+### Manual (for developers)
 
 ```bash
-cp .env.example .env          # add ANTHROPIC_API_KEY (and optional INTAKE_REPO_ROOT)
-pip install -r requirements.txt
-python watcher.py
+pip install ".[all]"     # or: pipx install ".[all]"
+intake setup             # interactive first-run config
+intake tray              # run as a system-tray app
+#   or
+intake start             # run in the terminal
 ```
 
-Place this folder anywhere. By default it walks up from `watcher.py` until it finds a directory containing `00_intake/`. To force a specific repo, set `INTAKE_REPO_ROOT` in `.env`.
+You'll need an Anthropic API key: <https://console.anthropic.com/>. It's stored
+in your OS keychain, not in the repo.
 
-## Run modes
+---
 
-```bash
-python watcher.py              # daemon: watch + process forever
-python watcher.py --once       # process whatever's in 00_intake/ now, then exit
-python watcher.py --dry-run    # log what would be done; don't call the agent
+## How it works
+
+```
+            drop a file
+                │
+        ┌───────▼────────┐   watch + wait until the file is fully written
+        │  inbox folder  │   (handles cloud-sync settling)
+        └───────┬────────┘
+                │ stage a local copy (safe to read off OneDrive/Dropbox/iCloud)
+        ┌───────▼────────┐   READ-ONLY agent: reads the document, explores your
+        │   the agent    │   repo with sandboxed tools, returns a structured
+        │  (Claude API)  │   verdict: where + what filename + confidence
+        └───────┬────────┘
+                │ verdict
+        ┌───────▼────────┐   the mover (the ONLY writer) places the file, creates
+        │   the mover    │   folders per your policy, dedups by content hash, and
+        │                │   records every action in an undo-able ledger
+        └───────┬────────┘
+        ┌───────▼────────┐
+        │  your  repo    │   filed, renamed to match siblings - or sent to review/
+        └────────────────┘
 ```
 
-## How the agent decides
+**The brains are repo-agnostic.** The system prompt is built from three layers:
 
-See [AGENT.md](AGENT.md) — that's the full system prompt the SDK sends. Routing rules, hard rules, and the RESULT-line contract live there. Edit `AGENT.md` to change behavior; no Python changes needed for routing tweaks.
+1. a built-in routing philosophy (pick the deepest specific folder, match naming
+   conventions, review when unsure),
+2. a live snapshot of *your* repo's folder tree, and
+3. your optional `intake.rules.md`.
 
-## Outcomes
+That's why it works on a brand-new repo it has never seen, and gets sharper as
+you add rules.
 
-Each item ends with one log line:
+**The agent never writes.** It can only read - and only inside your repo and the
+staged copy of the file under review (a hard path sandbox). A separate mover
+performs the actual move, so a crash mid-decision can never leave a half-filed
+file, and the agent can't fabricate a move that didn't happen.
 
-| Outcome | Meaning |
+---
+
+## Commands
+
+| Command | What it does |
 |---|---|
-| `MOVED` | File placed at destination. |
-| `NEW_FOLDER` | Agent created a folder (you approved the prompt) and moved the file in. |
-| `REVIEW` | Agent wasn't confident; file is in `00_intake/review/` with a reason. |
-| `UNSTABLE` | File kept changing during stability poll — re-drop it. |
-| `ERROR` | Agent loop failed. Check the log for the traceback. |
+| `intake setup` | Interactive first-run configuration. |
+| `intake tray` | Run as a system-tray app (start/stop, status, open folders, approvals). |
+| `intake start` | Watch the inbox in the terminal. `--dry-run` to detect without acting. |
+| `intake once` | Process whatever is in the inbox now, then exit. |
+| `intake status` | Show config and recent activity. |
+| `intake doctor` | Diagnose config, API key, and connectivity. |
+| `intake history` | List recent routing actions. |
+| `intake undo <id>` | Reverse a routing action (moves the file back to the inbox). |
+| `intake autostart enable` | Launch the tray app at login (per-OS, no admin needed). |
+| `intake config` | Print the active config file. |
 
-## Why a serial queue
+---
 
-If two files drop at once and both want a new vendor folder, processing them in parallel races on `mkdir`. Serial is slightly slower but avoids duplicate folders and double-prompts.
+## The tray app
 
-## Approving new folders
+`intake tray` puts an icon in your menu bar / system tray:
 
-When the agent calls `mkdir`, the Agent SDK prompts you in the daemon's terminal:
+- **blue** = watching · **amber** = working · **red** = something needs you ·
+  **grey** = paused
+- Pause/resume, open the inbox / review / repo / logs
+- When a file needs a **new folder** and your policy is `prompt`, the request
+  shows up under *Pending approvals* - approve or send to review from the menu.
+
+---
+
+## Configuration
+
+Written by `intake setup` to your OS config dir
+(`%LOCALAPPDATA%\intake-agent\config.toml` on Windows,
+`~/Library/Application Support/intake-agent/` on macOS,
+`~/.config/intake-agent/` on Linux). Key settings:
+
+| Setting | Meaning | Default |
+|---|---|---|
+| `repo.root` | The repository files get filed into. | - |
+| `repo.intake_dir` | Inbox folder (relative to the repo, or an absolute path - e.g. your Downloads). | `00_intake` |
+| `model.name` | Claude model. | `claude-sonnet-4-6` |
+| `model.confidence_threshold` | Below this, a placement is downgraded to review. | `0.55` |
+| `routing.new_folder_policy` | `auto` (create automatically), `prompt` (ask), or `review` (never create). | `prompt` |
+| `routing.rules_file` | Optional domain rules file in your repo. | `intake.rules.md` |
+
+### Routing rules (optional)
+
+Drop an `intake.rules.md` at your repo root to teach domain specifics - vendor
+aliases, "tax docs go here", naming patterns. See
+[`examples/vida.rules.md`](examples/vida.rules.md) for a full example.
+
+### Protecting a file from being moved
+
+Make the file's first line:
+
 ```
-Allow Bash(mkdir -p "admin/Finance/02_Expenses/Vendors/Apify")? [y/n]
+#INTAKE-AGENT SHOULD NEVER MOVE THIS FILE
 ```
-Approve once per new folder. Future files going to the same folder won't prompt.
 
-If you want auto-approval for known-safe patterns later (e.g. any new vendor under `Vendors/`), add a permission hook in `agent.py` — the SDK exposes `can_use_tool` for that.
+Source code, scripts, and config files are skipped automatically.
 
-## Logs
+---
 
-`logs/intake_YYYY-MM-DD.log` — one file per day. Captures every queued item, stability outcome, and final RESULT line.
+## Safety & privacy
+
+- The agent is **read-only** and **path-sandboxed** to your repo + the staged file.
+- Document contents are sent to the Anthropic API to make the routing decision.
+  Nothing else leaves your machine. Your API key lives in the OS keychain.
+- Every move is logged to a local SQLite ledger and is reversible with `undo`.
+
+---
+
+## Requirements
+
+- Python 3.11+
+- An Anthropic API key
+- Linux tray only: a system tray / AppIndicator (GNOME needs the AppIndicator
+  extension). The CLI (`intake start`) needs none.
+
+## License
+
+MIT - see [LICENSE](LICENSE).

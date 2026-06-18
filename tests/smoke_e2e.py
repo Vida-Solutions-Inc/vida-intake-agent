@@ -66,7 +66,7 @@ def main() -> int:
 
     print("\n=== RESULT TREE ===")
     for p in sorted(repo.rglob("*")):
-        if p.is_file() and "review" not in p.parts or (p.is_file() and p.parent.name == "review"):
+        if p.is_file():
             print("  ", p.relative_to(repo).as_posix())
     print(f"\n(temp repo: {repo})")
     return 0

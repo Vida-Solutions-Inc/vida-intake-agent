@@ -2,7 +2,7 @@
 
 Every path the model passes is sandboxed: it must resolve inside the repo root
 or be the staged copy of the file under review. This is a hard security boundary
-— the agent cannot read arbitrary disk, only the repository it routes into.
+- the agent cannot read arbitrary disk, only the repository it routes into.
 """
 
 from __future__ import annotations

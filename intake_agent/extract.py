@@ -1,7 +1,7 @@
 """Turn a file on disk into something the model can read: text or an image block.
 
 Every optional dependency is imported lazily and guarded, so the package still
-imports and runs with only the core deps installed — a file we can't extract
+imports and runs with only the core deps installed - a file we can't extract
 simply comes back as a note, and the agent routes it to review.
 """
 
@@ -107,7 +107,7 @@ def _extract_pdf(path: Path, max_bytes: int) -> Extracted:
     if not text:
         return Extracted(
             "empty",
-            note=f"PDF has no extractable text ({len(reader.pages)} pages) — likely "
+            note=f"PDF has no extractable text ({len(reader.pages)} pages) - likely "
             f"a scan. Decide from the filename, or route to review.",
         )
     return Extracted("text", text=text)

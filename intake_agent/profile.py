@@ -1,7 +1,7 @@
 """Build a compact snapshot of the target repo's folder structure.
 
 This snapshot is injected into the system prompt so the agent knows, up front,
-which folders actually exist in *this user's* repo — without it having to glob
+which folders actually exist in *this user's* repo - without it having to glob
 the whole tree on every file. The agent can still drill in with live tools; the
 snapshot is just a fast, accurate prior that makes routing work on any repo with
 zero hand-written rules.

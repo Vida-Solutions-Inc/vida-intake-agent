@@ -35,7 +35,7 @@ class Mover:
         if verdict.outcome in (Outcome.REVIEW, Outcome.UNKNOWN, Outcome.SKIP):
             return self._to_review(source, verdict.reason or verdict.outcome.value, verdict)
 
-        # MOVE — but gate on confidence first.
+        # MOVE - but gate on confidence first.
         if verdict.confidence < self.config.confidence_threshold:
             return self._to_review(
                 source,
@@ -172,11 +172,15 @@ class Mover:
         dest_dir.mkdir(parents=True, exist_ok=True)
         target = dest_dir / filename
         if target.exists():
+            # Same content already filed? Treat as a duplicate (-> review).
+            # Note: FileExistsError is an OSError subclass, so the hash check
+            # must sit outside the OSError guard or it would swallow the signal.
             try:
-                if _file_hash(target) == _file_hash(source):
-                    raise FileExistsError(f"identical file already at {target}")
+                same = _file_hash(target) == _file_hash(source)
             except OSError:
-                pass
+                same = False
+            if same:
+                raise FileExistsError(f"identical file already at {target}")
             stem, suffix = Path(filename).stem, Path(filename).suffix
             counter = 1
             while target.exists():

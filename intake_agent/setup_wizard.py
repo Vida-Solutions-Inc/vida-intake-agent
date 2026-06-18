@@ -67,7 +67,7 @@ def run_setup(reconfigure: bool = False) -> int:
     cfg = existing or Config()
 
     # --- repo root ---------------------------------------------------------
-    out("\n[bold]1. Repository[/bold] — the folder your files get filed into.")
+    out("\n[bold]1. Repository[/bold] - the folder your files get filed into.")
     repo = _ask_path("Path to your repository", cfg.repo_root or str(Path.cwd()))
     while not repo.is_dir():
         out(f"[red]Not a folder:[/red] {repo}")
@@ -75,7 +75,7 @@ def run_setup(reconfigure: bool = False) -> int:
     cfg.repo_root = str(repo)
 
     # --- inbox -------------------------------------------------------------
-    out("\n[bold]2. Inbox[/bold] — drop files here to have them filed.")
+    out("\n[bold]2. Inbox[/bold] - drop files here to have them filed.")
     intake_default = cfg.intake_dir or "00_intake"
     intake = _ask("Inbox folder (relative to the repo, or an absolute path)", intake_default)
     cfg.intake_dir = intake
@@ -97,7 +97,7 @@ def run_setup(reconfigure: bool = False) -> int:
     if rules_path and not rules_path.exists():
         if _yes(f"Create a starter rules file at {rules_path.name}?", default=True):
             rules_path.write_text(RULES_TEMPLATE, encoding="utf-8")
-            out(f"   Wrote [cyan]{rules_path}[/cyan] — edit it to teach domain rules.")
+            out(f"   Wrote [cyan]{rules_path}[/cyan] - edit it to teach domain rules.")
 
     # --- API key -----------------------------------------------------------
     out("\n[bold]5. Anthropic API key[/bold]")
@@ -112,7 +112,7 @@ def run_setup(reconfigure: bool = False) -> int:
                 out("   Stored in your OS keychain.")
                 cfg.api_key_inline = ""
             else:
-                out("   [yellow]keyring not available[/yellow] — storing in the config file. "
+                out("   [yellow]keyring not available[/yellow] - storing in the config file. "
                     "Install the keyring extra for secure storage.")
                 cfg.api_key_inline = key
 

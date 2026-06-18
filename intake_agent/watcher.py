@@ -180,7 +180,7 @@ class IntakeService:
         self.log.info(f"QUEUED   {path.name}")
 
         if not self._wait_until_stable(path):
-            self.log.warning(f"UNSTABLE {path.name}  (kept changing or vanished) — re-drop it")
+            self.log.warning(f"UNSTABLE {path.name}  (kept changing or vanished) - re-drop it")
             return
 
         if self.dry_run:

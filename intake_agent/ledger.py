@@ -1,4 +1,4 @@
-"""SQLite audit ledger of every routing action — powers `history` and `undo`.
+"""SQLite audit ledger of every routing action - powers `history` and `undo`.
 
 Every move is recorded with where the file came from and went, so a misroute can
 be reversed and the user has a durable trail of what the agent did.

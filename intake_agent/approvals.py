@@ -56,7 +56,7 @@ class CliApprover:
 
 
 class CallbackApprover:
-    """Delegates to a callable — used by the tray app to show a dialog.
+    """Delegates to a callable - used by the tray app to show a dialog.
 
     The callback receives (file_name, proposed_rel, reason) and returns the
     approved path, or None to decline.

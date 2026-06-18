@@ -110,7 +110,7 @@ def cmd_doctor(args) -> int:
         nonlocal ok
         ok = ok and passed
         mark = "[green]OK[/green]" if passed else "[red]FAIL[/red]"
-        _print(f"  {mark}  {label}" + (f"  — {detail}" if detail else ""))
+        _print(f"  {mark}  {label}" + (f"  - {detail}" if detail else ""))
 
     _print("[bold]Diagnostics[/bold]")
     check("config file present", config_exists(), "" if config_exists() else "run `intake setup`")
@@ -164,6 +164,20 @@ def cmd_undo(args) -> int:
         ledger.close()
 
 
+def cmd_autostart(args) -> int:
+    from . import autostart
+    if args.action == "enable":
+        path = autostart.enable()
+        _print(f"[green]Enabled[/green] launch at login: {path}")
+    elif args.action == "disable":
+        autostart.disable()
+        _print("[green]Disabled[/green] launch at login.")
+    else:  # status
+        path = autostart.status_path()
+        _print(f"Launch at login: {'[green]enabled[/green] - ' + str(path) if path else '[dim]disabled[/dim]'}")
+    return 0
+
+
 def cmd_config(args) -> int:
     from .platform_utils import config_file
     cf = config_file()
@@ -172,7 +186,7 @@ def cmd_config(args) -> int:
         _print("")
         _print(cf.read_text(encoding="utf-8"))
     else:
-        _print("[yellow](does not exist — run `intake setup`)[/yellow]")
+        _print("[yellow](does not exist - run `intake setup`)[/yellow]")
     return 0
 
 
@@ -236,7 +250,7 @@ def _have(mod: str) -> str:
 
 # --------------------------------------------------------------------- parser
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="intake", description=f"{APP_DISPLAY_NAME} — route inbox files into your repo with Claude.")
+    p = argparse.ArgumentParser(prog="intake", description=f"{APP_DISPLAY_NAME} - route inbox files into your repo with Claude.")
     p.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = p.add_subparsers(dest="command")
 
@@ -268,6 +282,10 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("undo", help="Reverse a routing action by id.")
     s.add_argument("id", type=int)
     s.set_defaults(func=cmd_undo)
+
+    s = sub.add_parser("autostart", help="Enable/disable launching the tray app at login.")
+    s.add_argument("action", choices=["enable", "disable", "status"], nargs="?", default="status")
+    s.set_defaults(func=cmd_autostart)
 
     s = sub.add_parser("config", help="Print the active config file.")
     s.set_defaults(func=cmd_config)

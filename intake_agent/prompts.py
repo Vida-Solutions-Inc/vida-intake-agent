@@ -2,11 +2,11 @@
 
 The prompt has three layers, most-general to most-specific:
 
-1. BASE_PHILOSOPHY  — repo-agnostic routing judgement + the output contract.
+1. BASE_PHILOSOPHY  - repo-agnostic routing judgement + the output contract.
    This is the genuinely reusable part: how to choose the deepest sensible
    folder, when to create vs. review, how to match naming conventions.
-2. Repo profile     — a live snapshot of *this* repo's folders (profile.py).
-3. User rules       — optional `intake.rules.md` in the repo, for domain
+2. Repo profile     - a live snapshot of *this* repo's folders (profile.py).
+3. User rules       - optional `intake.rules.md` in the repo, for domain
    specifics (vendor aliases, client names, "tax docs go here", etc.).
 
 Layers 2 and 3 make the same engine work on any repository without code changes.
@@ -80,7 +80,7 @@ def build_system_prompt(config: Config) -> str:
     parts.append(
         "## This repository's current structure\n\n"
         "Folders that already exist (with a few sample filenames so you can "
-        "match naming conventions). The inbox folder is excluded — never route "
+        "match naming conventions). The inbox folder is excluded - never route "
         "back into it.\n\n```\n" + profile + "\n```"
     )
 

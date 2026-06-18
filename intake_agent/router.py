@@ -2,7 +2,7 @@
 
 This replaces the old Node-based claude-CLI dependency. It drives the Messages
 API directly with the sandboxed tools in tools.py, and ends when the model calls
-`submit_verdict`. Pure Python — installs and runs anywhere the `anthropic`
+`submit_verdict`. Pure Python - installs and runs anywhere the `anthropic`
 package does (Windows incl. ARM64, macOS, Linux).
 """
 
@@ -69,7 +69,7 @@ class Router:
             if tool_results:
                 messages.append({"role": "user", "content": tool_results})
                 continue
-            # Model stopped without a verdict and without tools — nudge once.
+            # Model stopped without a verdict and without tools - nudge once.
             messages.append({"role": "user", "content": [{
                 "type": "text",
                 "text": "You did not call submit_verdict. Call it now with your "

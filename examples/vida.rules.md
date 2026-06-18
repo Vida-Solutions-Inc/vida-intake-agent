@@ -1,4 +1,4 @@
-# Intake routing rules — Vida Solutions, Inc.
+# Intake routing rules - Vida Solutions, Inc.
 
 Drop this file at the repo root as `intake.rules.md` to give the agent Vida's
 domain specifics on top of the live folder structure.
@@ -27,5 +27,5 @@ domain specifics on top of the live folder structure.
   `YYYY_Vendor_Invoice-<num>.pdf` or `YYYY-MM-DD_vendor_doctype.pdf`.
 
 ## Hard rules
-- Never route to `offerings/` — that is product code, not documents.
+- Never route to `offerings/` - that is product code, not documents.
 - Never route source code, scripts, or config files.

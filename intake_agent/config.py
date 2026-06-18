@@ -5,7 +5,7 @@ The config lives in the OS user-config dir (``platformdirs``) by default, e.g.
 - macOS:   ``~/Library/Application Support/intake-agent/config.toml``
 - Linux:   ``~/.config/intake-agent/config.toml``
 
-The API key is *not* stored here by default — it goes in the OS keychain via
+The API key is *not* stored here by default - it goes in the OS keychain via
 ``keyring`` when available. Resolution order at runtime:
 ``ANTHROPIC_API_KEY`` env var → keychain → ``[secrets].api_key`` in config.
 """
