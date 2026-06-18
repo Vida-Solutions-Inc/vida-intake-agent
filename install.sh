@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Intake Agent — one-step installer for macOS and Linux.
+# Intake Agent - one-step installer for macOS, Linux, and Windows Git Bash.
 # Run:  bash install.sh
+# (On Windows, install.ps1 is the native option; this also works in Git Bash.)
 # Creates a local virtual environment, installs the app, and launches setup.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -23,8 +24,17 @@ fi
 
 echo "Creating virtual environment (.venv)…"
 "$PY" -m venv .venv
-# shellcheck disable=SC1091
-source .venv/bin/activate
+# venv layout differs: .venv/bin on Unix, .venv/Scripts on Windows (Git Bash).
+if [ -f .venv/bin/activate ]; then
+  BIN=".venv/bin"
+elif [ -f .venv/Scripts/activate ]; then
+  BIN=".venv/Scripts"
+else
+  echo "Could not find the virtual environment's activate script." >&2
+  exit 1
+fi
+# shellcheck disable=SC1090
+source "$BIN/activate"
 
 python -m pip install --upgrade pip --quiet
 echo "Installing Intake Agent and dependencies…"
@@ -37,8 +47,8 @@ python -m intake_agent setup
 
 echo ""
 echo "Done. To start later:"
-echo "  ./.venv/bin/intake tray     # system-tray app"
-echo "  ./.venv/bin/intake start    # terminal"
+echo "  $BIN/intake tray     # system-tray app"
+echo "  $BIN/intake start    # terminal"
 echo ""
 echo "Linux note: the tray needs a system tray. On GNOME, install the"
 echo "'AppIndicator' extension; pystray uses libappindicator/GTK there."
