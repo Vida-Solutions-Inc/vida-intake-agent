@@ -159,7 +159,7 @@ Written by `intake setup` to your OS config dir
 
 Drop an `intake.rules.md` at your repo root to teach domain specifics - vendor
 aliases, "tax docs go here", naming patterns. See
-[`examples/vida.rules.md`](examples/vida.rules.md) for a full example.
+[`examples/example.rules.md`](examples/example.rules.md) for a full example.
 
 ### Protecting a file from being moved
 
