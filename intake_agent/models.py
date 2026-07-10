@@ -26,7 +26,7 @@ class Verdict:
     """
 
     outcome: Outcome
-    dest_folder: str = ""          # repo-relative, e.g. "admin/Finance/Vendors/Apify/"
+    dest_folder: str = ""          # repo-relative, e.g. "finance/Vendors/Apify/"
     new_filename: str = "keep"     # full filename with extension, or the literal "keep"
     confidence: float = 0.0        # 0.0–1.0 self-reported
     reason: str = ""

@@ -69,7 +69,7 @@ TOOL_DEFS: list[dict] = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "path": {"type": "string", "description": "Repo-relative folder path, e.g. 'admin/Finance'."}
+                "path": {"type": "string", "description": "Repo-relative folder path, e.g. 'finance'."}
             },
             "required": ["path"],
         },

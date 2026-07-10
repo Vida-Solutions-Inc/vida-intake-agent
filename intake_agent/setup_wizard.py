@@ -39,9 +39,9 @@ These rules guide the agent on top of its general judgement and the live folder
 structure. Keep them short and concrete. Delete the examples and add your own.
 
 ## Where things go
-- Vendor receipts and invoices -> `admin/Finance/Expenses/Vendors/<Vendor>/`
-- Bank / credit-card statements -> `admin/Finance/Banking/<Account>/`
-- Signed contracts -> `admin/Legal/Contracts/`
+- Vendor receipts and invoices -> `finance/Expenses/Vendors/<Vendor>/`
+- Bank / credit-card statements -> `finance/Banking/<Account>/`
+- Signed contracts -> `legal/Contracts/`
 - Client deliverables -> `clients/<client>/`
 
 ## Aliases

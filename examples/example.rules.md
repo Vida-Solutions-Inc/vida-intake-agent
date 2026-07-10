@@ -6,18 +6,18 @@ general judgement and the live folder structure. Everything here is illustrative
 - replace it with your own.
 
 ## Where things go
-- Vendor receipts / invoices -> `admin/Finance/Expenses/Vendors/<Vendor>/`
-- Invoices you sent to clients -> `admin/Finance/Revenue/`
-- Bank / credit-card statements -> `admin/Finance/Banking/<Account>/`
+- Vendor receipts / invoices -> `finance/Expenses/Vendors/<Vendor>/`
+- Invoices you sent to clients -> `finance/Revenue/`
+- Bank / credit-card statements -> `finance/Banking/<Account>/`
   (e.g. Checking, Business Card)
-- Payroll documents -> `admin/Finance/Payroll/`
-- Tax filings -> `admin/Finance/Tax/`
-- Company formation, articles, EIN -> `admin/Legal/Formation/`
-- Insurance policies -> `admin/Legal/Insurance/`
+- Payroll documents -> `finance/Payroll/`
+- Tax filings -> `finance/Tax/`
+- Company formation, articles, EIN -> `legal/Formation/`
+- Insurance policies -> `legal/Insurance/`
 - Client deliverables and meeting notes -> `clients/<client>/`
 - Active sales proposals / RFPs -> `sales/opportunities/active/<deal>/`
 - Closed deals -> `sales/opportunities/closed/<deal>/`
-- Event tickets, conference receipts -> `admin/Finance/Expenses/Events/`
+- Event tickets, conference receipts -> `finance/Expenses/Events/`
 
 ## Aliases
 Map the messy names that show up on documents to your canonical folder names:

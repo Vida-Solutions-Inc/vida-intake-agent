@@ -21,16 +21,16 @@ from intake_agent.watcher import IntakeService
 
 def build_repo(root: Path) -> None:
     for d in [
-        "admin/Finance/Expenses/Vendors/Anthropic",
-        "admin/Finance/Banking/Chase Checking",
-        "admin/Legal/Contracts",
+        "finance/Expenses/Vendors/Anthropic",
+        "finance/Banking/Chase Checking",
+        "legal/Contracts",
         "clients/acme",
         "marketing",
         "00_intake/review",
     ]:
         (root / d).mkdir(parents=True, exist_ok=True)
     # a few siblings so the agent can learn a naming convention
-    vend = root / "admin/Finance/Expenses/Vendors/Anthropic"
+    vend = root / "finance/Expenses/Vendors/Anthropic"
     (vend / "2026-01-15_anthropic_invoice.pdf").write_text("x")
     (vend / "2026-02-15_anthropic_invoice.pdf").write_text("x")
     (vend / "2026-03-15_anthropic_invoice.pdf").write_text("x")
