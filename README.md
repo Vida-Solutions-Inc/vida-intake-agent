@@ -142,9 +142,9 @@ the same inbox).
 ## Configuration
 
 Written by `intake setup` to your OS config dir
-(`%LOCALAPPDATA%\intake-agent\config.toml` on Windows,
-`~/Library/Application Support/intake-agent/` on macOS,
-`~/.config/intake-agent/` on Linux). Key settings:
+(`%LOCALAPPDATA%\intake-agent\config.toml` on Windows, <!-- ref: historical -->
+`~/Library/Application Support/intake-agent/` on macOS, <!-- ref: historical -->
+`~/.config/intake-agent/` on Linux). Key settings: <!-- ref: historical -->
 
 | Setting | Meaning | Default |
 |---|---|---|

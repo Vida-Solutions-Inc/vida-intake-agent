@@ -7,22 +7,22 @@ general judgement and the live folder structure. Everything here is illustrative
 
 ## Where things go
 - Vendor receipts / invoices -> `finance/Expenses/Vendors/<Vendor>/`
-- Invoices you sent to clients -> `finance/Revenue/`
+- Invoices you sent to clients -> `finance/Revenue/` <!-- ref: historical -->
 - Bank / credit-card statements -> `finance/Banking/<Account>/`
   (e.g. Checking, Business Card)
-- Payroll documents -> `finance/Payroll/`
-- Tax filings -> `finance/Tax/`
-- Company formation, articles, EIN -> `legal/Formation/`
-- Insurance policies -> `legal/Insurance/`
+- Payroll documents -> `finance/Payroll/` <!-- ref: historical -->
+- Tax filings -> `finance/Tax/` <!-- ref: historical -->
+- Company formation, articles, EIN -> `legal/Formation/` <!-- ref: historical -->
+- Insurance policies -> `legal/Insurance/` <!-- ref: historical -->
 - Client deliverables and meeting notes -> `clients/<client>/`
 - Active sales proposals / RFPs -> `sales/opportunities/active/<deal>/`
 - Closed deals -> `sales/opportunities/closed/<deal>/`
-- Event tickets, conference receipts -> `finance/Expenses/Events/`
+- Event tickets, conference receipts -> `finance/Expenses/Events/` <!-- ref: historical -->
 
 ## Aliases
 Map the messy names that show up on documents to your canonical folder names:
-- `acme`, `acme corp`, `acme inc` -> `clients/acme/`
-- `globex` -> `clients/globex/`
+- `acme`, `acme corp`, `acme inc` -> `clients/acme/` <!-- ref: historical -->
+- `globex` -> `clients/globex/` <!-- ref: historical -->
 
 ## Naming conventions
 - Match the dominant sibling pattern in the destination folder, e.g.

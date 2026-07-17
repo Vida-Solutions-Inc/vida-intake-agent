@@ -37,12 +37,12 @@ pyinstaller packaging/intake-agent.spec --noconfirm
 
 That yields:
 - Windows/Linux -> `dist/IntakeAgent(.exe)`
-- macOS -> `dist/IntakeAgent.app`
+- macOS -> `dist/IntakeAgent.app` <!-- ref: historical -->
 
 Then wrap it:
 - **Windows**: install Inno Setup, then
-  `iscc /DMyAppVersion=0.2.0 packaging\windows\intake-agent.iss` -> `Output\IntakeAgentSetup.exe`
-- **macOS**: `hdiutil create -volname "Intake Agent" -srcfolder dist/IntakeAgent.app -ov -format UDZO IntakeAgent.dmg`
+  `iscc /DMyAppVersion=0.2.0 packaging\windows\intake-agent.iss` -> `Output\IntakeAgentSetup.exe` <!-- ref: historical -->
+- **macOS**: `hdiutil create -volname "Intake Agent" -srcfolder dist/IntakeAgent.app -ov -format UDZO IntakeAgent.dmg` <!-- ref: historical -->
 - **Linux**: build an AppImage from `dist/IntakeAgent` (see the Linux step in the workflow).
 
 ## Per-OS notes
